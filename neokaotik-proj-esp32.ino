@@ -3,6 +3,7 @@
 #include <MFRC522v2.h>
 #include <MFRC522DriverSPI.h>
 #include <MFRC522DriverPinSimple.h>
+#include <ESP32Servo.h>
 
 // Define the Wi-Fi network credentials
 const char* ssid = ""; // Name
@@ -21,6 +22,10 @@ MFRC522DriverPinSimple ss_pin(5);
 MFRC522DriverSPI driver{ss_pin}; // Create SPI driver
 MFRC522 mfrc522{driver}; // Create MFRC522 instance
 
+// Define the servo and the pin it is connected to
+Servo myServo;
+const int servoPin = 13;
+
 void setup() {
   // Set software serial baud to 115200
   Serial.begin(115200);
@@ -28,6 +33,7 @@ void setup() {
   setUpWiFi();
   setUpBroker();
   setUpMFRC522();
+  setUpServo();
 }
 
 void setUpWiFi() {
@@ -60,9 +66,32 @@ void processMessages(char* topic, byte* payload, unsigned int length) {
   // if (topicString == "") {}
 }
 
+void moveServo(int startingPos, int endPos) {
+  int currentPos = startingPos;
+  
+  const int stepDelay = 0;
+
+  if (startingPos < endPos) {
+    while (currentPos < endPos) {
+      myServo.write(++currentPos);
+      delay(stepDelay);
+    }
+  } else {
+    while (currentPos > endPos) {
+      myServo.write(--currentPos);
+      delay(stepDelay);
+    }
+  }
+}
+
 void setUpMFRC522() {
   // Init MFRC522 board
   mfrc522.PCD_Init();
+}
+
+void setUpServo() {
+  // Tell the servo library which pin it is connected to
+  myServo.attach(servoPin);
 }
 
 void loop() {

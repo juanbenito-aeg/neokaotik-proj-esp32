@@ -6,8 +6,8 @@
 #include <ESP32Servo.h>
 
 // Define the Wi-Fi network credentials
-const char* ssid = ""; // Name
-const char* password = ""; // Password
+const char* ssid = "IKASLE-LAB"; // Name
+const char* password = "Wb_IKAS_LAB"; // Password
 
 // Define the MQTT broker parameters
 const char* mqtt_server = "broker.hivemq.com";
@@ -26,6 +26,9 @@ MFRC522 mfrc522{driver}; // Create MFRC522 instance
 Servo myServo;
 const int servoPin = 13;
 
+// Define the pin Buzzer
+const int buzzer = 22;
+
 void setup() {
   // Set software serial baud to 115200
   Serial.begin(115200);
@@ -34,6 +37,7 @@ void setup() {
   setUpBroker();
   setUpMFRC522();
   setUpServo();
+  setUpBuzzer();
 }
 
 void setUpWiFi() {
@@ -94,6 +98,10 @@ void setUpServo() {
   myServo.attach(servoPin);
 }
 
+void setUpBuzzer() {
+  pinMode(buzzer, OUTPUT);
+}
+
 void loop() {
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
@@ -102,6 +110,19 @@ void loop() {
   client.loop(); // Keep the connection alive
 
   publishRfidCardId();
+}
+
+void listenToCardAccessAndWhistle(bool isAuthorized) {  
+  digitalWrite(buzzer, HIGH);
+  delay(200);
+  digitalWrite(buzzer, LOW);
+
+  if (!isAuthorized) {
+    delay(200);
+    digitalWrite(buzzer, HIGH);
+    delay(200);
+    digitalWrite(buzzer, LOW);
+  }
 }
 
 void reconnect() {

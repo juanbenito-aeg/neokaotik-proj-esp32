@@ -72,8 +72,14 @@ void setUpBroker() {
 void processMessages(char* topic, byte* payload, unsigned int length) {
   String topicString = String(topic);
   
-  // Process messages
-  // if (topicString == "") {}
+  String message = "";
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+
+  if (topicString == "tower/access") {
+    listenTowerAccess(message);
+  }
 }
 
 void moveServo(int startingPos, int endPos) {
@@ -122,7 +128,9 @@ void lightLEDs(int redValue, int greenValue, int blueValue) {
   analogWrite(LED_RED, redValue);
   analogWrite(LED_GREEN, greenValue);
   analogWrite(LED_BLUE, blueValue);
-  delay(1000);
+}
+
+void offLEDs() {
   pinMode(LED_RED, LOW);
   pinMode(LED_GREEN, LOW);
   pinMode(LED_BLUE, LOW);
@@ -160,7 +168,21 @@ void reconnect() {
   }
 
   // Subscribe to topics
-  // client.subscribe("");
+  client.subscribe("tower/access");
+}
+
+void listenTowerAccess(String message) {
+  if (message == "authorized") {
+    lightLEDs(0, 255, 0);
+    listenToCardAccessAndWhistle(true);
+    offLEDs();
+    moveServo(0, 95); 
+    client.publish("tower/door", "open");
+  } else {
+    lightLEDs(0, 255, 255);
+    listenToCardAccessAndWhistle(false);
+    offLEDs();
+  }
 }
 
 void publishRfidCardId() {

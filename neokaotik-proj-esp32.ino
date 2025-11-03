@@ -6,8 +6,8 @@
 #include <ESP32Servo.h>
 
 // Define the Wi-Fi network credentials
-const char* ssid = "IKASLE-LAB"; // Name
-const char* password = "Wb_IKAS_LAB"; // Password
+const char* ssid = ""; // Name
+const char* password = ""; // Password
 
 // Define the MQTT broker parameters
 const char* mqtt_server = "broker.hivemq.com";
@@ -28,6 +28,12 @@ const int servoPin = 13;
 
 // Define the pin Buzzer
 const int buzzer = 22;
+
+//Colors LEDs
+const int LED_RED = 14;
+const int LED_GREEN = 26;
+const int LED_BLUE = 27;
+
 
 void setup() {
   // Set software serial baud to 115200
@@ -110,6 +116,16 @@ void loop() {
   client.loop(); // Keep the connection alive
 
   publishRfidCardId();
+}
+
+void lightLEDs(int redValue, int greenValue, int blueValue) {
+  analogWrite(LED_RED, redValue);
+  analogWrite(LED_GREEN, greenValue);
+  analogWrite(LED_BLUE, blueValue);
+  delay(1000);
+  pinMode(LED_RED, LOW);
+  pinMode(LED_GREEN, LOW);
+  pinMode(LED_BLUE, LOW);
 }
 
 void listenToCardAccessAndWhistle(bool isAuthorized) {  

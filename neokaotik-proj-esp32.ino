@@ -4,6 +4,7 @@
 #include <MFRC522DriverSPI.h>
 #include <MFRC522DriverPinSimple.h>
 #include <ESP32Servo.h>
+#include <ArduinoJson.h>
 
 // Define the Wi-Fi network credentials
 const char* ssid = ""; // Name
@@ -13,6 +14,7 @@ const char* password = ""; // Password
 const char* mqtt_server = "broker.hivemq.com";
 const int mqtt_port = 1883;
 
+
 // Create a partially initialized broker client instance
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -21,6 +23,8 @@ PubSubClient client(espClient);
 MFRC522DriverPinSimple ss_pin(5);
 MFRC522DriverSPI driver{ss_pin}; // Create SPI driver
 MFRC522 mfrc522{driver}; // Create MFRC522 instance
+
+String lastReadCardId = "";
 
 // Define the servo and the pin it is connected to
 Servo myServo;
@@ -172,12 +176,19 @@ void reconnect() {
 }
 
 void listenTowerAccess(String message) {
+  StaticJsonDocument<200> doc;  
+  doc["isDoorOpen"] = true;  
+  doc["cardId"] = lastReadCardId.c_str(); 
+
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
     offLEDs();
-    moveServo(0, 95); 
-    client.publish("tower/door", "open");
+    moveServo(95, 0); 
+
+    char jsonOutput[256]; 
+    serializeJson(doc, jsonOutput); 
+    client.publish("tower/door", jsonOutput);
   } else {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
@@ -203,7 +214,9 @@ void publishRfidCardId() {
     Serial.print("Card ID: ");
     Serial.println(idString);
 
-    client.publish("tower/cardid", (char*) idString.c_str());
+    lastReadCardId = (char*) idString.c_str();
+
+    client.publish("tower/cardid", lastReadCardId.c_str());
 
     // Finish reading the current card
     mfrc522.PICC_HaltA();

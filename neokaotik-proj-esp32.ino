@@ -33,11 +33,10 @@ const int servoPin = 13;
 // Define the pin Buzzer
 const int buzzer = 22;
 
-//Colors LEDs
+// Colors LEDs
 const int LED_RED = 14;
 const int LED_GREEN = 26;
 const int LED_BLUE = 27;
-
 
 void setup() {
   // Set software serial baud to 115200
@@ -83,6 +82,8 @@ void processMessages(char* topic, byte* payload, unsigned int length) {
 
   if (topicString == "tower/access") {
     listenTowerAccess(message);
+  } else if (topicString == "tower/door") {
+    listenTowerDoor(message);
   }
 }
 
@@ -173,18 +174,19 @@ void reconnect() {
 
   // Subscribe to topics
   client.subscribe("tower/access");
+  client.subscribe("tower/door");
 }
 
 void listenTowerAccess(String message) {
-  StaticJsonDocument<200> doc;  
-  doc["isDoorOpen"] = true;  
-  doc["cardId"] = lastReadCardId.c_str(); 
+  StaticJsonDocument<200> doc;
+  doc["isDoorOpen"] = true;
+  doc["cardId"] = lastReadCardId.c_str();
 
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
     offLEDs();
-    moveServo(95, 0); 
+    moveServo(0, 95); 
 
     char jsonOutput[256]; 
     serializeJson(doc, jsonOutput); 
@@ -193,6 +195,17 @@ void listenTowerAccess(String message) {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
     offLEDs();
+  }
+}
+
+void listenTowerDoor(String message) {
+  JsonDocument messageAsJson;
+  deserializeJson(messageAsJson, message);
+
+  const bool isDoorOpen = messageAsJson["isDoorOpen"];
+  
+  if (!isDoorOpen) {
+    moveServo(95, 0);
   }
 }
 

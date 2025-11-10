@@ -14,7 +14,6 @@ const char* password = "Wb_IKAS_LAB"; // Password
 const char* mqtt_server = "broker.hivemq.com";
 const int mqtt_port = 1883;
 
-
 // Create a partially initialized broker client instance
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -47,6 +46,7 @@ void setup() {
   setUpMFRC522();
   setUpServo();
   setUpBuzzer();
+  setUpLEDs();
 }
 
 void setUpWiFi() {
@@ -119,8 +119,15 @@ void setUpBuzzer() {
   pinMode(buzzer, OUTPUT);
 }
 
+void setUpLEDs() {
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+
+  lightLEDs(0, 255, 165);
+}
+
 void loop() {
-  defaultLEDs();
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
     reconnect();
@@ -130,18 +137,11 @@ void loop() {
   publishRfidCardId();
 }
 
-void defaultLEDs() {
-  analogWrite(LED_RED, 0);
-  analogWrite(LED_GREEN, 255);
-  analogWrite(LED_BLUE, 165);
-}
-
 void lightLEDs(int redValue, int greenValue, int blueValue) {
   analogWrite(LED_RED, redValue);
   analogWrite(LED_GREEN, greenValue);
   analogWrite(LED_BLUE, blueValue);
 }
-
 
 void listenToCardAccessAndWhistle(bool isAuthorized) {  
   digitalWrite(buzzer, HIGH);
@@ -187,7 +187,7 @@ void listenTowerAccess(String message) {
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
-    defaultLEDs();
+    lightLEDs(0, 255, 165);
     moveServo(0, 180); 
 
     char jsonOutput[256]; 
@@ -196,6 +196,7 @@ void listenTowerAccess(String message) {
   } else {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
+    lightLEDs(0, 255, 165);
   }
 }
 

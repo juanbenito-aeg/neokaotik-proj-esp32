@@ -8,8 +8,8 @@
 #include <ArduinoJson.h>
 
 // Define the Wi-Fi network credentials
-const char* ssid = ""; // Name
-const char* password = ""; // Password
+const char* ssid = "IKASLE-LAB"; // Name
+const char* password = "Wb_IKAS_LAB"; // Password
 
 // Define the MQTT broker parameters
 const char* mqtt_server = "10.50.0.50";
@@ -227,7 +227,7 @@ void setUpBuzzer() {
 
 void loop() {
   defaultLEDs();
-
+  
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
     reconnect();
@@ -294,7 +294,7 @@ void listenTowerAccess(String message) {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
     defaultLEDs();
-    moveServo(0, 95); 
+    moveServo(0, 180); 
 
     char jsonOutput[256]; 
     serializeJson(doc, jsonOutput); 
@@ -312,7 +312,7 @@ void listenTowerDoor(String message) {
   const bool isDoorOpen = messageAsJson["isDoorOpen"];
   
   if (!isDoorOpen) {
-    moveServo(95, 0);
+    moveServo(180, 0);
   }
 }
 

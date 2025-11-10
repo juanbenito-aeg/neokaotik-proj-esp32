@@ -188,7 +188,7 @@ void listenTowerAccess(String message) {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
     defaultLEDs();
-    moveServo(0, 95); 
+    moveServo(0, 180); 
 
     char jsonOutput[256]; 
     serializeJson(doc, jsonOutput); 
@@ -206,7 +206,7 @@ void listenTowerDoor(String message) {
   const bool isDoorOpen = messageAsJson["isDoorOpen"];
   
   if (!isDoorOpen) {
-    moveServo(95, 0);
+    moveServo(180, 0);
   }
 }
 

@@ -124,7 +124,7 @@ void setUpLEDs() {
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
 
-  lightLEDs(0, 255, 165);
+  lightLEDs(0, 255, 235);
 }
 
 void loop() {
@@ -187,7 +187,7 @@ void listenTowerAccess(String message) {
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
-    lightLEDs(0, 255, 165);
+    lightLEDs(0, 255, 235);
     moveServo(0, 180); 
 
     char jsonOutput[256]; 
@@ -196,7 +196,7 @@ void listenTowerAccess(String message) {
   } else {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
-    lightLEDs(0, 255, 165);
+    lightLEDs(0, 255, 235);
   }
 }
 

@@ -48,6 +48,7 @@ void setup() {
   setUpMFRC522();
   setUpServo();
   setUpBuzzer();
+  setUpLEDs();
 }
 
 void setUpWiFi() {
@@ -225,9 +226,15 @@ void setUpBuzzer() {
   pinMode(buzzer, OUTPUT);
 }
 
+void setUpLEDs() {
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+
+  lightLEDs(0, 255, 165);
+}
+
 void loop() {
-  defaultLEDs();
-  
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
     reconnect();
@@ -235,12 +242,6 @@ void loop() {
   client.loop(); // Keep the connection alive
 
   publishRfidCardId();
-}
-
-void defaultLEDs() {
-  analogWrite(LED_RED, 0);
-  analogWrite(LED_GREEN, 255);
-  analogWrite(LED_BLUE, 165);
 }
 
 void lightLEDs(int redValue, int greenValue, int blueValue) {
@@ -293,7 +294,7 @@ void listenTowerAccess(String message) {
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
-    defaultLEDs();
+    lightLEDs(0, 255, 165);
     moveServo(0, 180); 
 
     char jsonOutput[256]; 
@@ -302,6 +303,7 @@ void listenTowerAccess(String message) {
   } else {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
+    lightLEDs(0, 255, 165);
   }
 }
 

@@ -8,8 +8,8 @@
 #include <ArduinoJson.h>
 
 // Define the Wi-Fi network credentials
-const char* ssid = ""; // Name
-const char* password = ""; // Password
+const char* ssid = "IKASLE-LAB"; // Name
+const char* password = "Wb_IKAS_LAB"; // Password
 
 // Define the MQTT broker parameters
 const char* mqtt_server = "10.50.0.50";
@@ -34,6 +34,7 @@ const int servoPin = 13;
 const int buzzer = 22;
 
 // Colors LEDs
+const int LED = 25;
 const int LED_RED = 14;
 const int LED_GREEN = 26;
 const int LED_BLUE = 27;
@@ -48,6 +49,7 @@ void setup() {
   setUpMFRC522();
   setUpServo();
   setUpBuzzer();
+  setUpLED();
 }
 
 void setUpWiFi() {
@@ -178,6 +180,10 @@ void setUpBroker() {
   client.setCallback(processMessages);
 }
 
+void setUpLED() {
+  pinMode(LED, OUTPUT);
+}
+
 void processMessages(char* topic, byte* payload, unsigned int length) {
   String topicString = String(topic);
   
@@ -228,6 +234,7 @@ void setUpBuzzer() {
 void loop() {
   defaultLEDs();
 
+
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
     reconnect();
@@ -238,9 +245,11 @@ void loop() {
 }
 
 void defaultLEDs() {
-  analogWrite(LED_RED, 0);
-  analogWrite(LED_GREEN, 255);
-  analogWrite(LED_BLUE, 165);
+  lightLEDs(0, 255, 165);
+}
+
+void ligthLED(int value) {
+  digitalWrite(LED, value);
 }
 
 void lightLEDs(int redValue, int greenValue, int blueValue) {
@@ -294,6 +303,7 @@ void listenTowerAccess(String message) {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
     defaultLEDs();
+    ligthLED(HIGH);
     moveServo(0, 95); 
 
     char jsonOutput[256]; 
@@ -313,6 +323,7 @@ void listenTowerDoor(String message) {
   
   if (!isDoorOpen) {
     moveServo(95, 0);
+    ligthLED(LOW);
   }
 }
 

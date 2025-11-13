@@ -50,6 +50,7 @@ void setup() {
   setUpServo();
   setUpBuzzer();
   setUpLED();
+  setUpLEDs();
 }
 
 void setUpWiFi() {
@@ -231,10 +232,15 @@ void setUpBuzzer() {
   pinMode(buzzer, OUTPUT);
 }
 
+void setUpLEDs() {
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+
+  lightLEDs(0, 255, 235);
+}
+
 void loop() {
-  defaultLEDs();
-
-
   if (!client.connected()) {
     // Reconnect if the connection to the MQTT broker is lost
     reconnect();
@@ -244,13 +250,11 @@ void loop() {
   publishRfidCardId();
 }
 
-void defaultLEDs() {
-  lightLEDs(0, 255, 165);
-}
 
 void ligthLED(int value) {
   digitalWrite(LED, value);
 }
+
 
 void lightLEDs(int redValue, int greenValue, int blueValue) {
   analogWrite(LED_RED, redValue);
@@ -302,9 +306,9 @@ void listenTowerAccess(String message) {
   if (message == "authorized") {
     lightLEDs(0, 255, 0);
     listenToCardAccessAndWhistle(true);
-    defaultLEDs();
     ligthLED(HIGH);
-    moveServo(0, 95); 
+    lightLEDs(0, 255, 235);
+    moveServo(0, 180); 
 
     char jsonOutput[256]; 
     serializeJson(doc, jsonOutput); 
@@ -312,6 +316,7 @@ void listenTowerAccess(String message) {
   } else {
     lightLEDs(0, 255, 255);
     listenToCardAccessAndWhistle(false);
+    lightLEDs(0, 255, 235);
   }
 }
 
@@ -322,7 +327,7 @@ void listenTowerDoor(String message) {
   const bool isDoorOpen = messageAsJson["isDoorOpen"];
   
   if (!isDoorOpen) {
-    moveServo(95, 0);
+    moveServo(180, 0);
     ligthLED(LOW);
   }
 }

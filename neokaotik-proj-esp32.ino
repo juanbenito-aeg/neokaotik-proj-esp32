@@ -49,7 +49,6 @@ void setup() {
   setUpMFRC522();
   setUpServo();
   setUpBuzzer();
-  setUpLED();
   setUpLEDs();
 }
 
@@ -181,10 +180,6 @@ void setUpBroker() {
   client.setCallback(processMessages);
 }
 
-void setUpLED() {
-  pinMode(LED, OUTPUT);
-}
-
 void processMessages(char* topic, byte* payload, unsigned int length) {
   String topicString = String(topic);
   
@@ -233,6 +228,7 @@ void setUpBuzzer() {
 }
 
 void setUpLEDs() {
+  pinMode(LED, OUTPUT);
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
@@ -250,11 +246,9 @@ void loop() {
   publishRfidCardId();
 }
 
-
 void ligthLED(int value) {
   digitalWrite(LED, value);
 }
-
 
 void lightLEDs(int redValue, int greenValue, int blueValue) {
   analogWrite(LED_RED, redValue);
